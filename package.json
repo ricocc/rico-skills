@@ -1,0 +1,31 @@
+{
+  "name": "rico-skills",
+  "version": "1.0.0",
+  "description": "Skills shared by Rico for improving content creation and resource curation workflows with Claude Code",
+  "main": "index.js",
+  "files": [
+    "skills/",
+    ".claude-plugin/",
+    "scripts/",
+    "README.md",
+    "README.zh.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "postinstall": "node scripts/install.js",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "claude-code",
+    "skills",
+    "content-creation",
+    "article-generator",
+    "resource-curation"
+  ],
+  "author": "Rico",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ricocc/rico-skills.git"
+  }
+}

@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Local config (contains API keys)
+.rico-skills/
+*.env
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

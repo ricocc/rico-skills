@@ -1,0 +1,9 @@
+{
+  "name": "rico-skills",
+  "description": "Skills shared by Rico for improving content creation and resource curation workflows with Claude Code",
+  "version": "1.0.0",
+  "skills": [
+    "./skills/rico-resource-article",
+    "./skills/rico-ui-ux-themes"
+  ]
+}
