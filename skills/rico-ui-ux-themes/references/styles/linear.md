@@ -19,8 +19,9 @@ Linear's design philosophy is designed for extreme efficiency. Every pixel is ca
    - Display more information in limited space
    - Reduce scrolling, improve efficiency
 
-2. **Minimal Black and White - Remove Distractions**
-   - Black and white primarily, no extra colors
+2. **Dark Background + Violet Accent - Remove Distractions**
+   - Deep dark background primarily (#08090a)
+   - Violet/purple accent for brand (#7170ff)
    - Let content be the hero
    - Reduce visual noise
 
@@ -46,7 +47,13 @@ Linear's design philosophy is designed for extreme efficiency. Every pixel is ca
 
 ## Overview
 
-Linear style originates from linear.app—efficient, precise, compact. Suitable for SaaS platforms, project management tools, and data dashboards.
+Linear style originates from linear.app—efficient, precise, compact, with signature violet/purple accent (#7170ff). Suitable for SaaS platforms, project management tools, and data dashboards.
+
+**Note:** Linear supports both light and dark modes:
+- **Dark mode** (default): Deep dark background (#08090a) + violet accent
+- **Light mode**: Clean white background (#fcfcfc) + violet accent
+
+**Mode Strategy:** Dark-mode-first design, but fully supports light mode with adjusted colors.
 
 ---
 
@@ -55,9 +62,9 @@ Linear style originates from linear.app—efficient, precise, compact. Suitable 
 ### Brand Color
 
 ```css
---color-primary: #000000;        /* Black */
---color-primary-hover: #1A1A1A;
---color-secondary: #FFFFFF;
+--color-primary: #5e6ad2;       /* Linear purple - brand */
+--color-primary-hover: #828fff;
+--color-accent: #7170ff;         /* Violet accent */
 ```
 
 #### Usage Guidelines
@@ -75,56 +82,63 @@ Linear style originates from linear.app—efficient, precise, compact. Suitable 
 - Decorative elements
 - Non-critical information
 
-**Why Black and White?**
-- Extreme minimalism: No color distraction
+**Why Dark + Violet?**
+- Deep dark: Professional, technical feel
+- Violet accent: Brand identity, stands out
 - High contrast: Best readability
-- Timeless: Classic palette
-- Technical feel: Black and white = code, terminal
+- Modern: Current trend in developer tools
 
 ### Background Colors
 
 ```css
-/* Light mode */
---color-bg: #FFFFFF;
---color-bg-subtle: #F5F5F5;
---color-bg-hover: #F0F0F0;
+/* Light mode - Based on Linear actual colors */
+--color-bg: #fcfcfc;
+--color-bg-subtle: #f5f5f5;
+--color-bg-hover: #ededed;
+--color-bg-elevated: #ffffff;
 
-/* Dark mode - Pure black */
---color-bg-dark: #000000;
---color-bg-subtle-dark: #0A0A0A;
---color-bg-hover-dark: #111111;
+/* Dark mode - Based on Linear actual colors */
+--color-bg-dark: #08090a;
+--color-bg-secondary: #1c1c1f;
+--color-bg-tertiary: #232326;
+--color-bg-quaternary: #28282c;
+--color-bg-panel: #0f1011;
 ```
 
 ### Text Colors
 
 ```css
-/* Light mode - Black primarily */
---color-text: #000000;
---color-text-secondary: #525252;
---color-text-tertiary: #737373;
---color-text-disabled: #A3A3A3;
+/* Light mode - Based on Linear actual colors */
+--color-text: #1a1a1a;
+--color-text-secondary: #5b5b5d;
+--color-text-tertiary: #9b9b9d;
+--color-text-disabled: #ababab;
 
-/* Dark mode - White */
---color-text-dark: #FFFFFF;
---color-text-secondary-dark: #A3A3A3;
---color-text-tertiary-dark: #737373;
+/* Dark mode - Based on Linear actual colors */
+--color-text-dark: #f7f8f8;
+--color-text-secondary-dark: #d0d6e0;
+--color-text-tertiary-dark: #8a8f98;
 ```
 
 ### Border Colors
 
 ```css
---color-border: #E5E5E5;
---color-border-subtle: #F0F0F0;
+/* Light mode - Based on Linear actual colors */
+--color-border: #dcdcdc;
+--color-border-subtle: #ededed;
+--color-border-hover: #cecece;
 
-/* Dark mode */
---color-border-dark: #262626;
---color-border-subtle-dark: #171717;
+/* Dark mode - Based on Linear actual colors */
+--color-border-dark: #23252a;
+--color-border-secondary: #34343a;
 ```
 
 ### Accent Colors
 
 ```css
---color-accent: #000000;        /* Black accent */
+--color-accent: #7170ff;        /* Linear violet accent */
+--color-accent-hover: #828fff;
+--color-accent-tint: #18182f;
 --color-accent-purple: #8B5CF6;
 --color-accent-red: #EF4444;
 --color-accent-green: #22C55E;
@@ -363,11 +377,11 @@ Linear style originates from linear.app—efficient, precise, compact. Suitable 
 
 ### Common Errors
 
-#### Error 1: Using Colors
+#### Error 1: Using Wrong Accent Colors
 
-- Wrong: Blue primary buttons, colorful icons
-- Correct: Black and white primarily, purple accents
-- Reason: Loses minimal aesthetic, increases visual noise
+- Wrong: Blue primary buttons, colorful icons, blue/green accents
+- Correct: Deep dark background (#08090a), violet/purple accent (#7170ff)
+- Reason: Linear uses signature violet accent, not blue or green
 
 #### Error 2: Font Size Too Large
 
@@ -502,8 +516,12 @@ Linear style originates from linear.app—efficient, precise, compact. Suitable 
 }
 
 .btn-primary {
-  background: #000000;
+  background: #5e6ad2;
   color: white;
+}
+
+.btn-primary:hover {
+  background: #828fff;
 }
 
 .btn-secondary {
@@ -562,6 +580,27 @@ Linear style originates from linear.app—efficient, precise, compact. Suitable 
 .list-item:hover {
   background: #F5F5F5;
 }
+```
+
+---
+
+## Shadows
+
+```css
+/* Light mode shadows - Based on Linear actual colors */
+--shadow-low: 0px 3px 6px -2px #00000005, 0px 1px 1px #0000000b;
+--shadow-medium: 0 6px 18px #00000005, 0 3px 9px #0000000b, 0 1px 1px #0000000b;
+--shadow-high: 0 9px 48px #00000016, 0 6px 24px #0000001c, 0 1px 1px #0000000b;
+
+/* Dark mode shadows */
+--shadow-low-dark: 0px 2px 4px rgba(0, 0, 0, 0.1);
+--shadow-medium-dark: 0px 4px 24px rgba(0, 0, 0, 0.2);
+--shadow-high-dark: 0px 7px 32px rgba(0, 0, 0, 0.35);
+--shadow-stack-low-dark: 0px 8px 2px 0px rgba(0, 0, 0, 0),
+                    0px 5px 2px 0px rgba(0, 0, 0, 0.01),
+                    0px 3px 2px 0px rgba(0, 0, 0, 0.04),
+                    0px 1px 1px 0px rgba(0, 0, 0, 0.07),
+                    0px 0px 1px 0px rgba(0, 0, 0, 0.08);
 ```
 
 ---

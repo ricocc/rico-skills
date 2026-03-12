@@ -1,11 +1,9 @@
 ---
 name: rico-ui-ux-themes
 description: |
- UI/UX design optimization toolkit with 20 built-in themes and custom theme generation.
+  UI/UX design optimization toolkit with 20 built-in themes and custom theme generation.
   Applies design systems with color, typography, spacing optimization for any tech stack.
-  Use when user says "rico optimize", "rico 优化设计", "rico use style", "rico 用风格", 
-  or asks to optimize website design/优化网站设计, apply a theme/应用主题, generate themes/生成主题.
-
+  Use when user says "rico optimize", "rico 优化设计", "rico use style", "rico 用风格", "rico theme","rico 应用主题", "rico 生成主题", "rico design".
 license: MIT
 metadata:
   author: RicoUI (@ricouii)
@@ -13,420 +11,411 @@ metadata:
   user-invocable: true
 ---
 
-# Triggers
+# rico-ui-ux-themes
 
-This skill supports two trigger modes:
+UI/UX design optimization toolkit with 20 built-in themes and custom theme generation.
 
-**Mode 1: Explicit Command (rico prefix)**
-- rico optimize design / rico 优化设计
-- rico use [theme] style / rico 用 [主题] 风格
-- rico create theme: [url] / rico 制作主题：[url]
-- rico list themes / rico 有哪些主题
+## Workflow
 
-**Mode 2: Natural Language**
-- "Optimize this website's visual design"
-- "Apply Airbnb style to this page"
-- "Generate a theme from stripe.com"
+```
+[User Input] → [Read Current Project Code] → [Analyze 6 Issues] → [Select Mode] → [Confirm] → [Output]
+```
 
-If command ambiguous, respond with help message listing examples.
+**CRITICAL EXECUTION RULES:**
+1. **NEVER** show welcome message or greeting
+2. **ALWAYS** show selection menu A/B/C/D before execution
+3. **ALWAYS** wait for user input after showing menu
+4. **ALWAYS** confirm before making any changes
+5. **NEVER** skip steps or auto-execute without user confirmation
 
-# Examples
+**Key Notes:**
+- Automatically read code from current working directory when triggered (e.g., "optimize this project/page/design"). No need to ask "which project".
+- Language Rule: Detect from initial trigger (e.g., "rico 优化" = Chinese, "rico optimize" = English), then maintain consistent language throughout.
+- Project mode detection: Only generate missing light/dark mode if explicitly requested; never force switch.
+- Integration: Uses webReader (fetch URLs), Read/Write tools (code operations). All require confirmation.
 
-- rico optimize this website / rico 优化这个网站
-- rico use Claude style / rico 用 Claude 风格
-- rico create theme: duolingo.com / rico 制作主题：duolingo.com
-- rico list themes / rico 有哪些主题
-- Optimize my page design / 优化我的页面设计
-- create theme for this project
+### 4 Interaction Patterns
+
+| Pattern | Trigger Examples |
+|---------|-----------------|
+| **Full Flow** | rico optimize, rico 优化网站设计 |
+| **Direct Apply** | rico use Claude style, rico 用 Claude 风格 |
+| **Generate Theme** | rico create theme: stripe.com |
+| **Natural Language** | rico make it more vibrant |
+
+## Triggers and Interaction Patterns
+
+All commands use `rico` prefix. Supports 4 patterns:
+
+| Pattern | Trigger Examples | Brief Flow |
+|---------|------------------|------------|
+| **Full Flow** | rico optimize, rico 优化, rico 优化网站设计, rico improve this page design, rico 让页面更好看 | [Read Code] → [Analyze] → [Menu A/B/C/D] → [Select] → [Confirm] → [Output] |
+| **Direct Apply** | rico use [theme-name] style, rico 用 [主题名] 风格, rico 用 Claude 风格优化, rico use Minimal Blue colors + Neo-Brutalist borders | [Load Theme] → [Preview] → [Confirm] → [Apply] |
+| **Generate Theme** | rico create theme: [URL], rico 制作主题：[URL], rico 参考 [URL] 做主题 | [Fetch URL] → [Extract] → [Generate Doc] → [Save] → [Confirm Apply?] |
+| **Theme Management** | rico list themes, rico 有哪些主题, rico show [theme-name], rico 看看 [主题名] | [List/Show] → No further steps unless apply |
+
+**Natural Language Support:** e.g., "rico make it more vibrant" → Map to Full Flow or Direct Apply based on intent.
 
 
 
-# Core Instructions
+## Selection Menu (Full Flow)
 
-1. **For optimization**: Analyze provided website or UI code, apply selected theme, and output adjusted CSS/JS/React/Vue code with proper design system implementation.
+When user triggers "rico optimize", the workflow is:
 
-2. **For theme creation**: Use visual reverse engineering via webReader tool on provided URL to analyze design patterns, extract color schemes, typography, spacing, and generate complete 14-chapter theme documentation saved to `references/styles/[theme-name].md`.
+```
+[Read Current Project] → [Analyze 6 Dimensions] → [Show Menu A/B/C/D] → [User Selects] → [Confirm] → [Output]
+```
 
-3. **For theme application**: Load theme from `references/styles/`, analyze current code against design principles, perform 8-dimension check (color, typography, spacing, border-radius, shadow, interaction, icons, gradients), and generate optimized code with CSS variables and component styles.
+**IMPORTANT:** Show the menu immediately after reading code. Do NOT ask "what do you want to do" or show welcome message.
 
-4. **Natural language adjustments**: Handle requests like "make it more vibrant" by modifying color saturation, "increase rounded corners" by adjusting border-radius values, or "add more whitespace" by updating spacing system.
+### Show Selection Menu
 
-5. **Provide explanations**: Always explain key design decisions and "why" behind changes to help users understand the design system.
+- **A.** Optimize by design principles (no specific style)
+- **B.** Select from built-in themes (20 themes)
+- **C.** Generate theme from industry reference
+- **D.** Custom theme (URL or from project)
 
----
-
-## Optimization Analysis Framework
-
-Before optimization, analyze the current state and make informed decisions based on design principles.
-
-### 1. Theme Mode Detection & Adaptation
-
-→ *Consult [color reference](references/docs/color.md) for dual-mode color systems. Also see Impeccable's color principles below.*
-
-**Impeccable Color Principles:**
-- Use **OKLCH** color space for perceptually uniform palettes
-- Add subtle brand hue to neutrals (tinted neutrals: chroma 0.01)
-- Never use pure black (#000) or pure gray—always tint
-- Follow 60-30-10 rule: 60% neutrals, 30% secondary, 10% accent
-
-**DO**: Detect existing theme mode support in the project
-**DO**: Check if selected theme has both light and dark color definitions
-**DO**: Ensure optimized styles work in all detected modes
-**DON'T**: Apply single-mode styles to a dual-mode project without adaptation
-**DON'T**: Ignore existing dark mode implementation
-
-**Detection Checklist:**
-- Look for `prefers-color-scheme` media queries
-- Look for `[data-theme]`, `[data-mode]`, `.dark`, `.dark-mode` selectors
-- Look for CSS variables with `-dark` suffix or light/dark pairs
-
-**Adaptation Decision Matrix:**
-
-| Project Mode | Theme Support | Recommended Action |
-|-------------|--------------|-------------------|
-| Dual-mode | Both defined | Generate CSS variables for both modes |
-| Dual-mode | Only dark | Option A: Generate light mode via OKLCH inversion; Option B: Ask user |
-| Dual-mode | Only light | Option A: Generate dark mode via OKLCH inversion; Option B: Ask user |
-| Light-only | Any | Apply light mode colors, adapt if theme is dark-first |
-| Dark-only | Any | Apply dark mode colors, adapt if theme is light-first |
-
-**When theme lacks a mode (e.g., Agent Dark only has dark colors):**
-- Use OKLCH color space to generate complementary light/dark variants
-- Maintain brand color hue while adjusting lightness
-- Or inform user and ask for preference
-
-**Dark Mode Specific (from Impeccable):**
-- Dark mode is NOT inverted light mode
-- Use lighter surfaces for depth (not shadows)
-- Reduce text font weight slightly in dark mode
-- Never use pure black—use oklch(12-18%) dark gray
-
-### 2. Icon Handling
-
-**Impeccable Interaction Principles:**
-- Every interactive element needs 8 states: Default, Hover, Focus, Active, Disabled, Loading, Error, Success
-- Focus rings: Use `:focus-visible`, never `outline: none` without replacement
-- Touch targets: Minimum 44x44px
-
-**DO**: Analyze icon purpose before making changes
-**DO**: Preserve functional icons that convey meaning (navigation, actions, status)
-**DO**: Adapt icon colors for theme consistency when appropriate
-**DON'T**: Remove icons without understanding their purpose
-**DON'T**: Replace icon systems without migration strategy
-
-**Icon Analysis Framework:**
-
-| Icon Type | Purpose | Optimization Approach |
-|-----------|---------|----------------------|
-| Functional | Navigation, actions, status indicators | Preserve, adapt color if needed |
-| Decorative | Visual enhancement, brand identity | Can adapt style/color to match theme |
-| Interactive | Buttons, toggles, clickable elements | Maintain recognizability, adapt to theme |
-| Status | Success, error, warning indicators | Keep semantic meaning, adapt colors |
-
-**Color Adaptation Guidelines:**
-- SVG icons: Adjust `fill`, `stroke`, or use `currentColor`
-- Icon fonts: Ensure font-family is maintained, adjust color property
-- Image icons: Consider CSS filters for dark/light mode adaptation
-
-### 3. Gradient Evaluation
-
-**DO**: Understand gradient purpose before making changes
-**DO**: Consider if gradient serves a functional role (CTA emphasis, visual hierarchy)
-**DO**: Adapt gradient colors while preserving structure when appropriate
-**DON'T**: Replace gradients with solid colors without evaluating purpose
-**DON'T**: Ignore gradient's role in brand identity
-
-**Gradient Analysis Framework:**
-
-| Gradient Purpose | Example | Optimization Approach |
-|-----------------|---------|----------------------|
-| Brand identity | Hero backgrounds, signature buttons | Adapt colors, preserve gradient structure |
-| CTA emphasis | Primary action buttons | Evaluate if theme's button style is more effective |
-| Visual depth | Card backgrounds, overlays | Adapt to theme's depth language |
-| Decorative | Accents, highlights | Consider theme's aesthetic direction |
-
-**Decision Factors:**
-- Does the selected theme have a specific gradient style?
-- Is the gradient a key brand element or functional tool?
-- Would solid colors better serve the theme's aesthetic?
-- User preference (ask if unclear)
-
-### 4. Typography Analysis
-
-→ *Consult [typography reference](references/docs/typography.md). Also see Impeccable principles below.*
-
-**Impeccable Typography Principles:**
-- Use **modular scale** with fewer sizes but more contrast (xs, sm, base, lg, xl+)
-- Choose distinctive fonts—avoid Inter, Roboto, Open Sans (too generic)
-- Use `ch` units for measure (max-width: 65ch)
-- Line-height scales inversely with line length
-- Minimum 16px body text for accessibility
-- Use `font-display: swap` and match fallback metrics
-
-### 5. Spacing & Layout Analysis
-
-→ *Consult [layout reference](references/docs/layout.md). Also see Impeccable principles below.*
-
-**Impeccable Spatial Principles:**
-- Use **4pt base grid** (not 8pt) for granularity: 4, 8, 12, 16, 24, 32, 48, 64, 96
-- Use `gap` instead of margins for sibling spacing
-- Cards are overused—use spacing and alignment for grouping
-- Never nest cards inside cards
-- Use container queries (`@container`) for component-level responsiveness
-- Create hierarchy through multiple dimensions: size, weight, color, position, space
-
-### 6. Motion & Animation Analysis
-
-→ *Consult [motion reference](references/docs/motion.md). Also see Impeccable principles below.*
-
-**Impeccable Motion Principles:**
-- Use `prefers-reduced-motion` for accessibility (35% of adults over 40 have vestibular disorders)
-- Exit animations should be ~75% of enter duration
-- Use stagger with cap—don't stagger too many items
-- Perceived performance: 80ms threshold feels instant
-
-### 8-Dimension Analysis Checklist
-
-When analyzing code, evaluate these dimensions and document findings:
-
-1. **Color** - Contrast ratios (WCAG AA 4.5:1, AAA 7:1), saturation levels, brand color usage (≤10%), theme mode support, tinted neutrals
-2. **Typography** - Font scale, line-height rhythm, weight distribution, font family choices (distinctive vs generic), readability
-3. **Spacing** - Grid system used (4pt base), whitespace rhythm, compactness level, gap vs margin usage
-4. **Border Radius** - Size consistency, style unity with theme, avoid over-rounding
-5. **Shadow** - Weight, consistency, purpose (depth vs emphasis), subtle is better
-6. **Interaction** - 8 states implemented, hover/focus/active states, animations, feedback mechanisms
-7. **Icons** - System used, purpose classification, theme compatibility, accessibility
-8. **Gradients** - Purpose identification, theme fit assessment, brand identity preservation
+Enter option (A/B/C/D):
 
 ---
 
-## Design Anti-Patterns (What NOT to Do)
+### Option A: Design Principles
 
-Based on Impeccable's anti-patterns and common AI generation mistakes:
+User inputs: A
 
-### Color Anti-Patterns
-- **DON'T use gray text on colored backgrounds**—it looks washed out; use a shade of the background color instead
-- **DON'T use pure black (#000) or pure white (#fff)**—always tint; they don't exist in nature
-- **DON'T use the "AI color palette"**—cyan-on-dark, purple-to-blue gradients, neon accents on dark
-- **DON'T overuse brand colors**—accent works because it's rare (≤10% of page)
+```
+📋 6-Dimension Analysis Results
 
-### Typography Anti-Patterns
-- **DON'T use overused fonts**—Inter, Roboto, Arial, Open Sans, system defaults (unless appropriate)
-- **DON'T use monospace as lazy shorthand for "technical"**—it should serve a real purpose
-- **DON'T use too many font sizes close together**—create muddy hierarchy; use fewer sizes with more contrast
-- **DON'T ignore fallback fonts**—always define proper font stacks
+1. [⚠️] Color    - Contrast 3.2:1, below WCAG AA
+2. [⚠️] Typography - Inter font, unclear hierarchy
+3. [⚠️] Spacing  - Inconsistent, no grid system
+4. [✓]  Border-radius - Unified style
+5. [⚠️] Shadow   - Too heavy
+6. [⚠️] Interaction - Missing hover/focus states
 
-### Layout Anti-Patterns
-- **DON'T wrap everything in cards**—not everything needs a container
-- **DON'T nest cards inside cards**—visual noise, flatten the hierarchy
-- **DON'T use identical card grids**—same-sized cards repeated endlessly look templated
-- **DON'T center everything**—left-aligned with asymmetry feels more designed
-- **DON'T use the hero metric layout template**—big number, small label, gradient accent
+Select optimization mode:
+- a: All (recommended)
+- b: Issues only (1,2,3,5,6)
+- Or directly input numbers: 1,3 (custom), 3 (single)
 
-### Visual Details Anti-Patterns
-- **DON'T use glassmorphism everywhere**—blur effects should have purpose, not decorative
-- **DON'T use sparklines as decoration**—tiny charts that convey nothing meaningful
-- **DON'T use generic drop shadows**—safe and forgettable
-- **DON'T use rounded rectangles with thick colored border on one side**—lazy accent that rarely looks intentional
+Enter (a/b or numbers):
+```
 
-### Motion Anti-Patterns
-- **DON'T use bounce or elastic easing**—feels dated and tacky; real objects decelerate smoothly
-- **DON'T animate layout properties** (width, height, padding, margin)—use transform and opacity only
-- **DON'T animate everything**—animation fatigue is real
-- **DON'T ignore prefers-reduced-motion**—35% of adults over 40 have vestibular disorders
 
-### Interaction Anti-Patterns
-- **DON'T remove focus indicators** without replacement—accessibility violation
-- **DON'T use placeholders as labels**—they disappear on input
-- **DON'T make every button primary**—hierarchy matters; use ghost buttons, text links
-- **DON'T rely on gestures as the only way** to perform actions—provide visible fallbacks
+**Confirmation Dialog:**
+
+```
+📋 Ready to Optimize: Spacing
+
+Actions:
+• Establish unified 4pt grid
+• Adjust gaps and margins
+• Optimize whitespace rhythm
+
+Confirm? (y/n)
+```
+
+
+---
+
+### Option B: Built-in Themes
+
+User inputs: B
+
+
+```
+📊 Project Analysis
+Detected: SaaS / Enterprise App
+Style: Professional, clean, data-driven
+
+🎯 Recommended Themes:
+   • 6. Professional Blue ⭐
+         → Style: Stable blue + clear hierarchy
+         → Match: 95%
+
+   • 1. Claude
+         → Style: Warm white + ocher orange
+         → Match: 88%
+
+   • 8. Dashboard Clean
+         → Style: Clean admin, data-focused
+         → Match: 85%
+
+   • 7. Trust Finance
+         → Style: Deep blue + gold
+         → Match: 82%
+
+   • 2. Minimal Blue
+         → Style: Dark BG + blue accent
+         → Match: 78%
+
+• Enter number to select
+• Enter L to view all themes (built-in + user-created)
+
+Enter:
+
+```
+
+**After theme selection:**
+
+```
+Selected: 5. Agent Dark (Dark theme)
+
+📋 Style Features:
+   • Deep black background + vibrant purple accent
+   • Modern & creative
+   • Best for: AI agents, creative tools
+   • Mode: Dark (single mode)
+
+🔧 Actions:
+   • Apply dark background (#0A0A0B)
+   • Add purple accent (#A855F7)
+   • Optimize border-radius to 8px
+
+Confirm? (y/n)
+```
+
+### Option C: Industry Reference
+
+User inputs: C
+
+
+```
+📊 Project Type Detection
+
+Detected: SaaS / Enterprise
+(If incorrect, enter correct type)
+
+🌐 Industry Reference Websites:
+   1. stripe.com
+      → Style: Deep blue + gold accents, professional
+      → Features: Minimal, whitespace, clear hierarchy
+
+   2. linear.app
+      → Style: Dark BG + purple gradient, modern tech
+      → Features: Refined interaction, subtle animation
+
+   3. notion.so
+      → Style: White BG + minimal, content-first
+      → Features: Clean, efficient, distraction-free
+
+   4. figma.com
+      → Style: Colorful gradient + vibrant purple
+      → Features: Creative, professional, collaborative
+
+   5. vercel.com
+      → Style: B&W minimal + neon gradient
+      → Features: Cool, modern, developer-friendly
+
+   • Enter number to select
+   • Enter URL to use custom website
+   • Enter n to skip
+
+Enter:
+```
+
+User inputs: 1
+
+
+   📋 Actions:
+   • Fetch stripe.com design features
+   • Analyze color, typography, spacing system
+   • Generate theme file
+   • Apply to current project
+
+   Confirm? (y/n)
+
+---
+
+### Option D: Custom Theme
+
+User inputs: D
+
+```
+🎨 Custom Theme
+
+1. Input URL
+   → Example: apple.com
+
+2. Generate from current project
+   → Extract existing design
+
+Enter option (1/2) or URL:
+```
+
+**If option 2 (generate from project):**
+
+
+AI response:
+
+```
+📋 Actions:
+• Analyze current project design features
+• Extract color, typography, spacing system
+• Generate theme file
+
+Enter theme name: [my-brand]
+
+Save location:
+   1. Current project
+      → references/styles/my-brand.md
+      → Project-only access
+
+   2. User global directory
+      → ~/.rico/themes/my-brand.md
+      → Available for all projects
+
+Enter (1/2):
+```
+
+
+User inputs: 1
+
+AI response:
+Analyzing project design features...
+Generating theme file...
+
+✅ Theme saved to: references/styles/my-brand.md
+
+Apply to optimization? (y/n)
+```
+
+**Option D Notes:**
+- Supports URL input or generate from current project
+- When generating from project, ask for theme name and save location
+- Save location options: project or global
+
+---
+
+## 6-Dimension Analysis Framework
+
+For detailed guidelines, see `references/docs/`.
+
+| Dimension | Check Points | Reference |
+|-----------|--------------|-----------|
+| **1. Color** | Contrast (WCAG AA 4.5:1), brand usage ≤10%, saturation, light/dark mode | color.md |
+| **2. Typography** | Hierarchy, line-height, font weight, alignment | typography.md |
+| **3. Spacing** | Grid system (4pt), whitespace, alignment | layout.md |
+| **4. Border-radius** | Consistency, unified style | component.md |
+| **5. Shadow** | Hierarchy, meaning, avoid generic | component.md |
+| **6. Interaction** | 8 states (default/hover/focus/active/disabled/loading/error/success), feedback | motion.md |
+
+### Quick Analysis Checklist
+
+| Issue Type | Common Problems |
+|------------|-----------------|
+| Color | Low contrast, color abuse, washout on colored bg |
+| Typography | Inconsistent sizes, line-height, mixed fonts |
+| Spacing | No grid, cramped, misaligned |
+| Border-radius | Inconsistent sizes, mixed styles |
+| Shadow | Too heavy, meaningless, generic |
+| Interaction | Missing states, weak feedback |
+
+For complete audit methodology, see `references/docs/polish.md`.
+
+## Design Anti-Patterns
+
+Based on Impeccable design principles:
+
+### Visual
+- **DON'T** use gray text on colored backgrounds → use tinted shade
+- **DON'T** use pure black (#000) or white (#fff) → always tint
+- **DON'T** use "AI color palette" (cyan-on-dark, purple gradients)
+- **DON'T** overuse brand colors → accent ≤10%
+
+### Layout
+- **DON'T** wrap everything in cards
+- **DON'T** nest cards inside cards
+- **DON'T** center everything → asymmetry feels more designed
+
+### Typography
+- **DON'T** use overused fonts (Inter, Roboto, Arial)
+- **DON'T** use too many similar font sizes → muddy hierarchy
+
+### Motion
+- **DON'T** use bounce easing → feels dated
+- **DON'T** animate layout properties → use transform only
+- **DON'T** ignore prefers-reduced-motion
 
 ### The AI Slop Test
 
-**Critical quality check**: If you showed this interface to someone and said "AI made this," would they believe you immediately? If yes, that's the problem.
-
-A distinctive interface should make someone ask "how was this made?" not "which AI made this?"
-
-Review the anti-patterns above—they are the fingerprints of AI-generated work from 2024-2025.
+If someone says "AI made this" and it's immediately obvious → that's the problem.
+Distinctive design makes people ask "how was this made?" not "which AI?"
 
 ---
 
-## Quick Start
+## Built-in Themes
 
-### First Time Use
+**Theme Sources:**
+- Built-in: 20 themes stored in `references/styles/`
+- User-created: Any `.md` file in `references/styles/` is automatically available
 
-#### 1. Choose a Theme
+When user creates a new theme (Option D), it is automatically added to the theme list.
 
-```
-rico 用 Claude 风格 / rico use Claude style
-rico 看看有哪些主题 / rico list themes
-```
+### Developer Tools
+| Theme | Description | Best For |
+|-------|------------|----------|
+| Claude | Warm white + ocher orange, rational & warm | AI products, dev tools |
+| Minimal Blue | Dark BG + blue accent, minimal | Code editors, assistants |
+| Marketplace Dark | Dark + code aesthetics | Dev marketplaces |
+| SaaS Dark | Monitoring dark, real-time | DevOps, monitoring |
+| Agent Dark | Deep black + vibrant purple | AI agents, creative |
 
-#### 2. Optimize a Page
+### Business & Enterprise
+| Theme | Description | Best For |
+|-------|------------|----------|
+| Professional Blue | Stable blue + clear hierarchy | SaaS, B2B |
+| Trust Finance | Deep blue + gold | Fintech, banking |
+| Dashboard Clean | Clean admin, data-focused | Enterprise dashboards |
 
-```
-rico 帮我优化这个网站 / rico optimize this website
-rico 优化我的首页 / rico optimize my homepage
-```
+### Creative Design
+| Theme | Description | Best For |
+|-------|------------|----------|
+| Retro Vibrant | High saturation + bold | Fashion, art |
+| Creative Gallery | Image grid + visual first | Portfolios, galleries |
+| Neo-Brutalist | Bold borders + solid shadows | Creative agencies |
+| Creative Vitality | Vibrant orange + gradients | Creative studios |
 
-#### 3. Generate Custom Theme
+### Media & Culture
+| Theme | Description | Best For |
+|-------|------------|----------|
+| Radio Static | B&W + TV static | Podcasts, radio |
+| Record Club | Vinyl aesthetic + warm | Music platforms |
 
-```
-rico 制作主题：stripe.com / rico create theme: stripe.com
-rico 参考 apple.com 做主题 / rico create theme from: apple.com
-```
+### Commerce
+| Theme | Description | Best For |
+|-------|------------|----------|
+| Vibrant Commerce | Orange-red + yellow | E-commerce, retail |
 
-### Example Conversations
-
-#### User: rico 用 Airbnb 风格优化我的首页 / rico use Airbnb style for my homepage
-
-**AI Response:**
-
-Understood, I'll apply these Airbnb style characteristics:
-
-- Warm coral red primary color (#FF5A5F)
-- Large rounded corners (8-12px)
-- Generous whitespace, highlight images
-- Restrained brand color usage (≤ 10%)
-
-[Reading code and generating optimized code...]
-
-#### User: rico 看看 Trust Finance 主题 / rico show Trust Finance theme
-
-**AI Response:**
-
-**Trust Finance Style**
-- Position: Fintech, Banking, B2B
-- Primary: Deep Blue #0052CC (secure & trustworthy)
-- Secondary: Gold #FFAB00 (wealth & success)
-- Features: Small border-radius 6-8px (professional), restrained animations, generous whitespace
-
-Best for: Banking, payments, insurance, enterprise services
-
----
-
-## Unified Prefix
-
-All commands MUST use the `rico` prefix to trigger this skill.
-
-### Supported Actions (Chinese / English)
-
-**1. One-Click Optimization**
-```
-rico 帮我优化这个网站
-rico optimize this website
-rico 让页面更好看
-rico improve this page design
-rico 优化设计
-rico optimize design
-rico 优化我的页面
-rico optimize my page
-```
-
-**2. Style Selection**
-```
-rico 用 [主题名] 风格
-rico use [theme-name] style
-rico 用 Claude 风格优化
-rico optimize with Claude style
-```
-
-**3. Theme Generation**
-```
-rico 制作主题：[URL]
-rico create theme: [URL]
-rico 参考 [URL] 做主题
-rico create theme from: [URL]
-```
-
-**4. Theme Application**
-```
-rico 用这个主题优化
-rico apply this theme
-rico 用 Minimal Blue 风格设计
-rico design with Minimal Blue style
-```
-
-**5. Theme Management**
-```
-rico 有哪些主题
-rico list themes
-rico 看看 [主题名] 主题
-rico show [theme-name] theme
-rico 删除 [主题名] 主题
-rico delete [theme-name] theme
-```
+### Brand Styles
+| Theme | Description | Best For |
+|-------|------------|----------|
+| Airbnb | Warm coral + whitespace | Travel, hospitality |
+| Linear | Sleek dark + refined | Productivity tools |
+| Notion | Clean minimal + content | Documentation |
+| Duolingo | Playful bright + gamified | Education |
+| Spotify | Dark + vibrant green | Music streaming |
 
 ---
 
-## Built-in Themes (20 Themes)
+## Theme Generation
 
-### Developer Tools Class
-
-| Theme Name | File | Description | Best For |
-|------------|------|-------------|----------|
-| **Claude** | `claude.md` | Warm white + ocher orange, rational & warm | AI products, dev tools, tech docs |
-| **Minimal Blue** | `minimal-blue.md` | Dark BG + blue accent, minimal & professional | Code editors, AI assistants, dev tools |
-| **Marketplace Dark** | `marketplace-dark.md` | Dark theme + code aesthetics | Dev marketplaces, tech resources, open source directories |
-| **SaaS Dark** | `saas-dark.md` | Monitoring dark theme, real-time status | DevOps, monitoring, observability platforms |
-| **Agent Dark** | `agent-dark.md` | Deep black + vibrant purple, artistic | AI agents, creative studios, experimental projects |
-
-### Business & Enterprise Class
-
-| Theme Name | File | Description | Best For |
-|------------|------|-------------|----------|
-| **Professional Blue** | `professional-blue.md` | Stable blue + clear hierarchy | SaaS, B2B, enterprise apps, analytics |
-| **Trust Finance** | `trust-finance.md` | Deep blue + gold, secure & professional | Fintech, banking, B2B, insurance |
-| **Dashboard Clean** | `dashboard-clean.md` | Clean admin, data-focused | Enterprise dashboards, admin panels, B2B platforms |
-
-### Creative Design Class
-
-| Theme Name | File | Description | Best For |
-|------------|------|-------------|----------|
-| **Retro Vibrant** | `retro-vibrant.md` | High saturation + bold visual | Coffee brands, fashion, indie music, art exhibitions |
-| **Creative Gallery** | `creative-gallery.md` | Image grid + visual first | Design resources, inspiration galleries, portfolios |
-| **Neo-Brutalist** | `neo-brutalist.md` | Bold borders + solid shadows | Creative agencies, fashion brands, indie games |
-| **Creative Vitality** | `creative-vitality.md` | Vibrant orange + gradients, dynamic | Creative studios, art products, design agencies |
-
-### Media & Culture Class
-
-| Theme Name | File | Description | Best For |
-|------------|------|-------------|----------|
-| **Radio Static** | `radio-static.md` | B&W dominant + TV static | Community radio, podcasts, audio blogs |
-| **Record Club** | `record-club.md` | Vinyl aesthetic + warm earth tones | Record stores, music platforms, vinyl communities |
-
-### Commerce Class
-
-| Theme Name | File | Description | Best For |
-|------------|------|-------------|----------|
-| **Vibrant Commerce** | `vibrant-commerce.md` | Orange-red + yellow, action-oriented | E-commerce, retail, shopping, flash sales |
-
-### Brand Style Class
-
-| Theme Name | File | Description | Best For |
-|------------|------|-------------|----------|
-| **Airbnb** | `airbnb.md` | Warm coral + generous whitespace | Travel, hospitality, sharing economy |
-| **Linear** | `linear.md` | Sleek dark + refined interactions | Productivity tools, SaaS apps |
-| **Notion** | `notion.md` | Clean minimal + content-focused | Knowledge management, documentation |
-| **Duolingo** | `duolingo.md` | Playful bright + gamified elements | Education, language learning, gamification |
-| **Spotify** | `spotify.md` | Dark theme + vibrant green accent | Music streaming, media apps |
-
----
-
-## Theme Generation Workflow
-
+### Workflow
 ```
-User Input: rico 制作主题：[URL]
-    ↓
-┌─────────────────────────────────────────┐
-│  1. Fetch target page (webReader tool)   │
-│  2. Visual reverse engineering           │
-│  3. Generate design system doc           │
-│  4. Save to references/styles/[name].md  │
-│  5. Show preview, await confirmation    │
-│  6. Ask if apply to project              │
-└─────────────────────────────────────────┘
+[URL] → [webReader fetch] → [Extract design] → [Generate 14-chapter doc] → [Save]
 ```
+
+### Reference Documents
+
+Use these docs from `references/docs/` when generating themes:
+
+- **themes-guide.md** - 14-chapter template for theme structure
+- **color.md** - Color system guidelines
+- **typography.md** - Typography rules
+- **layout.md** - Spacing/grid system
+- **component.md** - Component design standards
+- **motion.md** - Animation principles
+- **polish.md** - 6-dimension audit framework
 
 ### Generated Theme Structure (14 Chapters)
 
@@ -467,26 +456,39 @@ Every generated theme includes:
 
 Plus 7 more chapters covering typography, spacing, shadows, components, animations, and use cases.
 
+
+### Save Location
+- Project: `references/styles/[theme-name].md`
+- Global: `~/.rico/themes/[theme-name].md`
+
 ---
 
 ## Theme Application Workflow
 
 ```
-User Input: rico 用 [主题] 风格优化
+User Input: rico apply [theme-name]
     ↓
-┌─────────────────────────────────────────┐
-│  1. Load theme from references/styles/    │
-│  2. Detect project theme mode support     │
-│  3. Check theme's light/dark definitions │
-│  4. Determine adaptation strategy        │
-│  5. Analyze code: 8-dimension check     │
-│  6. Apply Impeccable design principles   │
-│  7. Generate optimized code              │
-│  8. Explain key decisions               │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│  1. Load theme from references/styles/   │
+│  2. Detect theme mode (light/dark)      │
+│  3. Switch project to theme's mode       │  ← Key: Apply dark → switch to dark
+│  4. Analyze code: 6-dimension check     │
+│  5. Apply theme colors, spacing, etc.   │
+│  6. Generate optimized code             │
+│  7. Explain key decisions               │
+└──────────────────────────────────────────┘
 ```
 
-### Analysis Dimensions (8-Dimension Check)
+**Theme Mode Application Rule:**
+| Project Mode | Theme Mode | Action |
+|--------------|------------|--------|
+| Single (light/dark) | Dual (both) | Use only project's existing mode colors |
+| Single (light/dark) | Single | Apply theme's defined mode |
+| Dual (both) | Any | Apply theme's defined mode |
+
+**Never force switch mode.** Theme's dual-mode is "supported", not "required".
+
+### Analysis Dimensions
 
 AI checks these design dimensions:
 
@@ -515,267 +517,122 @@ Located in `references/docs/`:
 
 ---
 
-## Theme File Structure
 
-```
-references/styles/
-├── claude.md              # Built-in - Claude style
-├── minimal-blue.md        # Built-in - Minimal Blue
-├── marketplace-dark.md    # Built-in - Marketplace Dark
-├── saas-dark.md           # Built-in - SaaS Dark
-├── agent-dark.md          # Built-in - Agent Dark
-├── professional-blue.md   # Built-in - Professional Blue
-├── trust-finance.md       # Built-in - Trust Finance
-├── dashboard-clean.md     # Built-in - Dashboard Clean
-├── retro-vibrant.md       # Built-in - Retro Vibrant
-├── creative-gallery.md    # Built-in - Creative Gallery
-├── neo-brutalist.md       # Built-in - Neo-Brutalist
-├── creative-vitality.md   # Built-in - Creative Vitality
-├── radio-static.md        # Built-in - Radio Static
-├── record-club.md         # Built-in - Record Club
-├── vibrant-commerce.md    # Built-in - Vibrant Commerce
-├── airbnb.md              # Built-in - Airbnb style
-├── linear.md              # Built-in - Linear style
-├── notion.md              # Built-in - Notion style
-├── duolingo.md            # Built-in - Duolingo style
-├── spotify.md             # Built-in - Spotify style
-└── [user-generated].md    # Custom themes
-```
+### Mode Detection
 
----
+| Project Mode | Theme Support | Action |
+|--------------|---------------|--------|
+| Dual-mode | Both defined | Generate CSS variables for both |
+| Light-only | Any | Apply light mode only (don't auto-add dark) |
+| Dark-only | Any | Apply dark mode only (don't auto-add light) |
 
-## Complete Example Conversation
+**Note:** Only generate missing mode if user explicitly requests it. Don't auto-generate dark/light mode unless asked.
 
-### Scenario: Generating and Applying a Theme
+### Key Decisions to Explain
 
-#### User: rico 制作主题：stripe.com
-
-**AI Response:**
-
-[Fetching stripe.com via webReader...]
-
-Analyzing Stripe's visual design...
-- Deep blue primary (#0052CC) conveying trust
-- Clean gradients for depth
-- 8px border-radius (professional but friendly)
-- Generous whitespace for readability
-- Fast animations (100-150ms)
-
-Generating theme file...
-
-**Preview: Trust Finance Style**
-- Position: Fintech, Banking, B2B
-- Primary: #0052CC (blue - secure & trustworthy)
-- Secondary: #FFAB00 (gold - wealth & success)
-- Border-radius: 6-8px
-- Animations: 150-200ms
-- Spacing: 8px grid, generous whitespace
-
-✅ Saved to: `references/styles/trust-finance.md`
-
-确认这个主题吗？/ Confirm this theme?
-
-#### User: 确认
-
-**AI Response:**
-
-✅ Theme confirmed!
-
-需要应用到项目吗？/ Apply to project?
-
-#### User: 应用到我的登录页 / Apply to my login page
-
-**AI Response:**
-
-[Reading login page code...]
-
-**Analysis Results:**
-- Project mode: Dual-mode detected (supports light/dark via `prefers-color-scheme`)
-- Theme mode: Claude theme has both light and dark definitions ✓
-- Icons: Found 5 functional icons (navigation), 2 status icons
-- Gradients: Found 1 gradient button (CTA)
-
-**Applying Claude style with Impeccable principles:**
-
-**Key Decisions:**
-1. Theme mode: Dual-mode CSS variables generated
-2. Icons: Preserved all functional icons, adapted colors for theme consistency
-3. Gradient: Preserved CTA gradient, adapted brand colors to Claude's ocher orange
-4. Applied 8-dimension check:
-   - Color: Adjusted to warm white tones, OKLCH recommended
-   - Typography: Changed to distinctive font (not Inter), 14px base
-   - Spacing: 4pt grid system, compact layout
-   - Border-radius: 6px for buttons, 8px for cards
-   - Shadow: Subtle shadows for depth
-   - Interaction: 8 states implemented, focus-visible rings added
-   - Icons: Preserved with theme-compatible colors
-   - Gradients: Preserved CTA gradient structure
-
-**Generated code includes:**
-- CSS variables for both light and dark modes
-- prefers-reduced-motion support
-- WCAG AA compliant contrast ratios
-
-[Generating optimized code...]
-
----
-
-## Bilingual Support
-
-This skill supports both Chinese and English commands seamlessly.
-
-### Chinese Examples (中文示例)
-
-```
-rico 用 Claude 风格优化这个页面
-rico 制作主题：stripe.com
-rico 看看有哪些主题
-rico 优化我的登录页
-```
-
-### English Examples (英文示例)
-
-```
-rico optimize this page with Claude style
-rico create theme: stripe.com
-rico list all themes
-rico optimize my login page
-```
-
-Both language inputs will trigger the same functionality.
-
----
-
-## Theme Naming Convention
-
-All themes follow **"Style + Color/Feature"** naming:
-
-**Developer Tools:**
-- Minimal Blue（极简蓝）
-- Marketplace Dark（市场深色）
-- SaaS Dark（SaaS 深色）
-- Agent Dark（智能体深色）
-
-**Business & Enterprise:**
-- Professional Blue（专业蓝）
-- Trust Finance（信任金融）
-- Dashboard Clean（清爽仪表盘）
-
-**Creative Design:**
-- Retro Vibrant（复古鲜艳）
-- Creative Gallery（创意画廊）
-- Neo-Brutalist（新粗野主义）
-- Creative Vitality（创意活力）
-
-**Media & Culture:**
-- Radio Static（广播噪点）
-- Record Club（唱片俱乐部）
-
-**Commerce:**
-- Vibrant Commerce（活力电商）
-
-**Brand Styles:**
-- Airbnb、Linear、Notion、Duolingo、Spotify
-
-This naming convention helps users quickly understand each theme's core characteristics and applicable scenarios.
+- Theme mode strategy
+- Icon handling (preserve vs adapt)
+- Gradient handling (preserve vs adapt)
+- Impeccable principles applied
 
 ---
 
 ## Technical Stack Support
 
-Automatically adapts to: React, Vue, Angular, Mini Programs, Pure HTML, Sass/SCSS, Tailwind, Next.js
+Auto-adapt to: React, Vue, Angular, HTML, Sass/SCSS, Tailwind, Next.js, Mini Programs
 
-| Tech Stack | Support | Special Handling |
-|------------|---------|-----------------|
-| **React** | ✅ Full | JSX, styled-components, CSS Modules |
-| **Vue** | ✅ Full | Vue SFC, scoped styles |
-| **Angular** | ✅ Full | Component styles, global styles |
-| **Mini Programs** | ✅ Full | rpx, custom components |
-| **HTML/CSS** | ✅ Full | Native CSS, CSS variables |
-| **Sass/SCSS** | ✅ Full | Variables, mixins, nesting |
-| **Tailwind** | ✅ Full | Theme config, custom classes |
-| **Next.js** | ✅ Full | CSS Modules, Tailwind |
-
-Auto-detects tech stack and generates appropriate code format.
+| Stack | Support | Handling |
+|-------|---------|----------|
+| React | Full | JSX, styled-components, CSS Modules |
+| Vue | Full | Vue SFC, scoped styles |
+| Angular | Full | Component styles |
+| HTML/CSS | Full | CSS variables |
+| Sass/SCSS | Full | Variables, mixins |
+| Tailwind | Full | Theme config |
+| Mini Programs | Full | rpx, custom components |
 
 ---
 
 ## Best Practices
 
-### Choosing the Right Theme
+### Choosing Theme
 
-1. **Developer Tools** → Claude, Minimal Blue, Marketplace Dark, SaaS Dark
-2. **AI Agents & Creative Studios** → Agent Dark, Creative Vitality
-3. **Enterprise Apps** → Professional Blue, Trust Finance, Dashboard Clean
-4. **Creative Brands** → Retro Vibrant, Creative Gallery, Neo-Brutalist
-5. **Audio & Music** → Radio Static, Record Club, Spotify
-6. **E-commerce** → Vibrant Commerce
-7. **Brand Style** → Airbnb, Linear, Notion, Duolingo
+| Project Type | Recommended Themes |
+|--------------|-------------------|
+| Developer Tools | Claude, Minimal Blue, Marketplace Dark |
+| AI Agents | Agent Dark, Creative Vitality |
+| Enterprise | Professional Blue, Trust Finance |
+| Creative Brands | Retro Vibrant, Neo-Brutalist |
+| Audio/Music | Radio Static, Record Club, Spotify |
+| E-commerce | Vibrant Commerce |
+| Brand Style | Airbnb, Linear, Notion |
 
 ### Combining Themes
-
-Reference multiple themes' design elements:
-
 ```
 rico use Minimal Blue colors + Neo-Brutalist borders
 ```
 
-### Fine-tuning Themes
-
-Adjust after generation:
-
+### Fine-tuning
 ```
 rico create theme: example.com
-User: Colors too dark
-AI: Adjusting lighter...
-
-User: Larger border-radius
-AI: Increasing to 12px...
+User: Colors too dark → AI: Adjusting lighter...
+User: Larger border-radius → AI: Increasing to 12px...
 ```
 
 ---
 
 ## Output Format
 
-Optimized code includes:
+Generated code includes:
 
-1. **CSS Variables** - Complete color, spacing, typography system with appropriate theme mode support (using OKLCH recommended)
-2. **Component Styles** - Button, input, card, navigation styles adapted to theme
+1. **CSS Variables** - Complete system with OKLCH color space
+2. **Component Styles** - Button, input, card, nav adapted to theme
 3. **Responsive Design** - Mobile, tablet, desktop breakpoints
-4. **Accessibility** - WCAG 2.1 AA compliant (4.5:1 for text, 3:1 for UI)
-5. **Code Comments** - Explanation of key design decisions and rationale
-6. **Icon Handling** - Icons preserved or adapted with explanation
-7. **Gradient Handling** - Gradients preserved, adapted, or replaced with explanation
-8. **Motion Support** - Include prefers-reduced-motion support
+4. **Accessibility** - WCAG 2.1 AA compliant
+5. **Code Comments** - Key design decisions explained
+6. **Motion** - prefers-reduced-motion support
 
-**Output should include a brief decision summary:**
-- Theme mode strategy applied (dual-mode / single-mode)
-- Icon handling decisions with rationale
-- Gradient handling decisions with rationale
-- Key Impeccable principles applied
+**Always include decision summary:**
+- Theme mode strategy
+- Icon/gradient handling rationale
+- Impeccable principles applied
 
 ---
 
-## Integration with AI Tools
+## Quick Examples
+
+### User: rico optimize this website
+
+```
+[Read code] → [Analyze 6 dimensions] → [Show menu A/B/C/D] → [User selects] → [Confirm] → [Generate]
+```
+
+### User: rico use Claude style
+
+```
+[Load claude.md] → [Show style preview] → [Confirm] → [Apply to code]
+```
+
+### User: rico create theme: stripe.com
+
+```
+[Fetch stripe.com] → [Extract design] → [Generate doc] → [Save] → [Confirm] → [Apply?]
+```
+
+## Theme Naming Convention
+
+All themes follow **"Style + Color/Feature"** naming.
+
+This naming convention helps users quickly understand each theme's core characteristics and applicable scenarios.
+
+---
+
+## Integration
 
 This skill integrates with:
+
 - **webReader tool** - Fetch target pages for theme generation
 - **Read tool** - Read existing code files
 - **Write/Edit tools** - Generate optimized code
-- **Bash tool** - Execute file operations
 
----
-
-## File Management
-
-### Theme Storage Location
-
-All themes are stored in: `references/styles/[theme-name].md`
-
-### User-Generated Themes
-
-Custom themes are automatically saved and can be:
-- Listed via: `rico list themes`
-- Viewed via: `rico show [theme-name] theme`
-- Applied via: `rico use [theme-name] style`
-- Deleted via: `rico delete [theme-name] theme`
+All operations require user confirmation before execution.
