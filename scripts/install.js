@@ -25,6 +25,7 @@ console.log('');
 console.log('Available Skills:');
 console.log('  • rico-resource-article - Generate recommendation articles');
 console.log('  • rico-ui-ux-themes - UI/UX design optimization with 20 themes');
+console.log('  • rico-design-md - Create design system documents from any website URL');
 console.log('');
 console.log('Documentation:');
 console.log('  • README.md - Full documentation');
