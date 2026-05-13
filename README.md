@@ -110,12 +110,50 @@ User: Larger border-radius → AI increases to 12px
 
 ---
 
+### rico-design-md
+
+**Design System Document Generator** - Convert any website into design system documents, or convert between design token formats.
+
+**Trigger when**: User wants to create DESIGN.md, extract design tokens, analyze a brand's design system, or convert between formats.
+
+```
+# ✅ Correct triggers
+rico DESIGN.md https://linear.app
+rico tokens https://stripe.com
+rico 全部输出 github
+Create a DESIGN.md for linear.app
+Extract design tokens from stripe.com
+分析 GitHub 的设计系统
+
+# Format conversion
+rico 把 DESIGN.md 转为 tokens
+```
+
+**5 Output Formats:**
+
+| File | Format | Description |
+| ------ | -------- | ------------- |
+| `DESIGN.md` | Markdown | Full style reference with brand voice, tokens, components |
+| `preview.html` | HTML | Self-contained visual design system preview page |
+| `tokens.json` | DTCG JSON | Standard design tokens, compatible with style dictionary |
+| `variables.css` | CSS | CSS custom properties grouped by category |
+| `theme.css` | CSS | Tailwind v4 `@theme` format |
+
+**Default:** `rico DESIGN.md [url]` generates both `DESIGN.md` + `preview.html`.
+
+**Output saved to:** `themes/{brand-slug}/`
+
+📄 **Detailed Guide**: [guides/rico-design-md.md](guides/rico-design-md.md)
+
+---
+
 ## Skill Overview
 
 | Skill | Purpose | Key Features |
-|-------|---------|--------------|
+| ------- | --------- | -------------- |
 | **rico-resource-article** | Generate curated content articles | Step-by-step workflow, any domain, optional screenshots |
 | **rico-ui-ux-themes** | Optimize website design | 20 themes, reverse engineer any site, natural language tweaks |
+| **rico-design-md** | Extract design systems from websites | 5 output formats, format conversion, visual preview |
 
 ---
 
@@ -160,7 +198,7 @@ MIT License
 
 
 
-**Last Updated**: 2026-03-
+**Last Updated**: 2026-05-13
 
 - **Github**: [@ricocc](https://github.com/ricocc)
 

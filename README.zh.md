@@ -109,12 +109,50 @@ Make my website look more professional
 
 ---
 
+### rico-design-md
+
+**设计系统文档生成器** - 将任意网站转换为设计系统文档，或在不同设计令牌格式之间转换。
+
+**触发条件**：用户想要创建 DESIGN.md、提取设计令牌、分析品牌设计系统，或在格式之间转换。
+
+```
+# ✅ 正确触发
+rico DESIGN.md https://linear.app
+rico tokens https://stripe.com
+rico 全部输出 github
+为 linear.app 创建 DESIGN.md
+提取 stripe.com 的设计令牌
+分析 GitHub 的设计系统
+
+# 格式转换
+rico 把 DESIGN.md 转为 tokens
+```
+
+**5 种输出格式：**
+
+| 文件 | 格式 | 说明 |
+| ------ | ------ | ------ |
+| `DESIGN.md` | Markdown | 完整样式参考，含品牌声音、令牌、组件 |
+| `preview.html` | HTML | 独立的可视化设计系统预览页面 |
+| `tokens.json` | DTCG JSON | 标准设计令牌，兼容 style dictionary |
+| `variables.css` | CSS | 按类别分组的 CSS 自定义属性 |
+| `theme.css` | CSS | Tailwind v4 `@theme` 格式 |
+
+**默认**：`rico DESIGN.md [url]` 同时生成 `DESIGN.md` + `preview.html`。
+
+**输出保存至**：`themes/{brand-slug}/`
+
+📄 **详细指南**：[guides/rico-design-md-zh.md](guides/rico-design-md-zh.md)
+
+---
+
 ## 技能概览
 
 | 技能 | 用途 | 核心特性 |
-|------|------|----------|
+| ------ | ------ | ---------- |
 | **rico-resource-article** | 生成资源推荐文章 | 分步流程、任意领域、可选截图 |
 | **rico-ui-ux-themes** | 优化网站设计 | 20 种主题、逆向工程任意网站、自然语言调整 |
+| **rico-design-md** | 从网站提取设计系统 | 5 种输出格式、格式转换、可视化预览 |
 
 ---
 
@@ -157,7 +195,7 @@ MIT License
 
 ---
 
-**最后更新**：2026-03-11
+**最后更新**：2026-05-13
 
 - **维护者**：[推特@ricouii](https://x.com/ricouii)
 
