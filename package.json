@@ -1,6 +1,6 @@
 {
   "name": "rico-skills",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Skills shared by Rico for improving content creation and resource curation workflows with Claude Code",
   "main": "index.js",
   "files": [
@@ -20,7 +20,8 @@
     "skills",
     "content-creation",
     "article-generator",
-    "resource-curation"
+    "resource-curation",
+    "chinese-writing"
   ],
   "author": "Rico",
   "license": "MIT",

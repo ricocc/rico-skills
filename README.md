@@ -147,6 +147,37 @@ rico 把 DESIGN.md 转为 tokens
 
 ---
 
+### rico-writer
+
+**Chinese Humanized Writing & De-AI Editor** - Write, expand, polish, or diagnose Chinese text so it reads specific, clear, and opinionated, like a real person wrote it.
+
+**Trigger when**: User asks to write, expand, polish, or diagnose Chinese articles, tweets, product intros, reviews, tutorials, or asks to remove AI flavor / sound more human.
+
+```
+# ✅ Correct triggers
+帮我把这段文章去 AI 味润色一下
+把我的笔记扩写成一篇公众号文章
+Rewrite this review as a Chinese X/Twitter thread, keep my judgment
+这段文案帮我写得像人说话一点
+
+# ❌ Don't trigger (pure translation / proofreading / formatting)
+把这段翻译成英文
+帮我检查错别字
+把这个 markdown 排版整理一下
+```
+
+**What it does:**
+- Preserves facts, numbers, technical terms, the author's stance and certainty level
+- Removes binary-contrast shells ("不是A，而是B"), pseudo-insight markers ("本质上""更重要的是"), lecturing openers ("记住这句话"), and unsupported hype ("必备神器")
+- Replaces anthropomorphic verbs ("给模型喂素材" → "把素材提供给模型")
+- Enforces punctuation conventions (double quotes instead of 「」, no em-dashes in original prose)
+- Never fabricates experiences, usage durations, data, or decision thresholds
+- Does not dictate openings, article structure, or endings - they follow the author's material
+
+📄 **Detailed Guide**: [guides/rico-writer.md](guides/rico-writer.md)
+
+---
+
 ## Skill Overview
 
 | Skill | Purpose | Key Features |
@@ -154,6 +185,7 @@ rico 把 DESIGN.md 转为 tokens
 | **rico-resource-article** | Generate curated content articles | Step-by-step workflow, any domain, optional screenshots |
 | **rico-ui-ux-themes** | Optimize website design | 20 themes, reverse engineer any site, natural language tweaks |
 | **rico-design-md** | Extract design systems from websites | 5 output formats, format conversion, visual preview |
+| **rico-writer** | Chinese writing & de-AI polishing | Fact-safe rewriting, sentence-pattern & punctuation rules, articles to tweets |
 
 ---
 
@@ -198,7 +230,7 @@ MIT License
 
 
 
-**Last Updated**: 2026-05-13
+**Last Updated**: 2026-11-05
 
 - **Github**: [@ricocc](https://github.com/ricocc)
 

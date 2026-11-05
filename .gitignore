@@ -15,3 +15,6 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Skill evaluation workspaces (skill-creator)
+skills/*-workspace/
